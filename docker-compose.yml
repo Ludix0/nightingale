@@ -1,0 +1,29 @@
+services:
+  nightingale:
+    build: .
+    container_name: nightingale
+    restart: unless-stopped
+    environment:
+      - PUID=1000             # Ton ID utilisateur (tapez 'id' dans votre console)
+      - PGID=1000             # Ton ID groupe
+      - GAME_PORT=7777
+      - RCON_PORT=27015
+      - GAME_PASSWORD=${password}
+      - ADMIN_PASSWORD=${adminPassword}
+    volumes:
+      - $HOME/volumes/nightingale/filesServer:/home/steam/nightingale-server  # Dossier du jeu
+      - $HOME/volumes/steamcmd:/home/steam/steamcmd            # Volume SteamCMD
+    ports:
+      - "${jeux1}:7777/udp"
+      - "27015:27015/tcp"
+  
+    # Surveillance du serveur
+    healthcheck:
+      test: ["CMD", "rcon-cli", "help"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 300s # Laisse 5 min pour le download initial
+
+volumes:
+  steam_data:
